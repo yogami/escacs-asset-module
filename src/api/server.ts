@@ -19,6 +19,8 @@ app.route('/api/assets', assetRoutes);
 // Health check
 app.get('/api/health', (c) => c.json({ status: 'healthy', service: 'asset-module' }));
 
+const port = parseInt(process.env.PORT || '8080', 10);
+
 // OpenAPI doc
 app.doc('/api/openapi.json', {
     openapi: '3.0.0',
@@ -27,14 +29,17 @@ app.doc('/api/openapi.json', {
         version: '1.0.0',
         description: 'Post-construction BMP health tracking',
     },
-    servers: [{ url: 'http://localhost:3004', description: 'Local' }],
+    servers: [{ url: `http://localhost:${port}`, description: 'Local' }],
 });
 
 app.get('/api/docs', swaggerUI({ url: '/api/openapi.json' }));
 
-const port = parseInt(process.env.PORT || '3004', 10);
 console.log(`Asset Module running on port ${port}`);
 
-serve({ fetch: app.fetch, port });
+serve({
+    fetch: app.fetch,
+    port: port,
+    hostname: '0.0.0.0'
+});
 
 export default app;
